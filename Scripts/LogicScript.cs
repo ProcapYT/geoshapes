@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using Unity.VisualScripting;
 
 public class LogicScript : MonoBehaviour
 {
@@ -15,7 +16,6 @@ public class LogicScript : MonoBehaviour
     public Text gameOverScoreText;
     public Text highscoreText;
     public Animator scoreAnim;
-    public Text pauseText;
     public GameObject gamePausedText;
     public PlayerScript player;
 
@@ -29,6 +29,7 @@ public class LogicScript : MonoBehaviour
     public Text shotSpeedText;
     public Text speedText;
     public Text damageText;
+    public Text bulletSpeedText;
     public TextMeshPro floorText;
     public int currentFloor = 1;
 
@@ -51,6 +52,13 @@ public class LogicScript : MonoBehaviour
     public Animator notificationAnim;
     public Text notificationName;
 
+    public GameObject[] foundHUDItems;
+
+    public Animator minimapAnim;
+    public Animator minimapCamAnim;
+
+    public TextMeshProUGUI extraItemsText;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -69,7 +77,8 @@ public class LogicScript : MonoBehaviour
             player.spectralBullets = true;
             maxPlayerHp = 110;
             playerHP = 110;
-        } else
+        }
+        else
         {
             PlayerPrefs.SetString("Player square", "False");
             player.gameObject.GetComponent<SpriteRenderer>().sprite = circle;
@@ -81,7 +90,7 @@ public class LogicScript : MonoBehaviour
 
             player.shotSpeed = 0.25f;
         }
-        
+
         if (PlayerPrefs.GetString("Holy player", "False") == "True")
         {
             player.gameObject.GetComponent<SpriteRenderer>().sprite = crucifix;
@@ -116,7 +125,10 @@ public class LogicScript : MonoBehaviour
 
             maxPlayerHp = 20;
             playerHP = 20;
-        }   
+        }
+
+        timeText.gameObject.SetActive(false);
+        scoreText.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -126,9 +138,10 @@ public class LogicScript : MonoBehaviour
 
         hpSlider.maxValue = maxPlayerHp;
         hpSlider.value = playerHP;
-        hpText.text = $"{playerHP.ToString()}/{maxPlayerHp.ToString()}";
+        hpText.text = $"{playerHP}/{maxPlayerHp}";
         scoreText.text = score.ToString("#,0.##");
         damageText.text = player.playerDamage.ToString("#,0.##");
+        bulletSpeedText.text = player.bulletSpeed.ToString();
 
         shotSpeedText.text = $"{player.shotSpeed.ToString("0.##")}s";
         speedText.text = player.playerForce.ToString("0.##");
@@ -138,10 +151,28 @@ public class LogicScript : MonoBehaviour
 
         timeText.text = FormatTime(elipsedTime);
 
+        // minimap
+        if (Input.GetKeyDown(KeyCode.M)) {
+            minimapAnim.SetTrigger("Expand");
+            minimapCamAnim.SetTrigger("Expand");
+
+            timeText.gameObject.SetActive(true);
+            scoreText.gameObject.SetActive(true);
+        }
+
+        if (Input.GetKeyUp(KeyCode.M)) {
+            minimapAnim.SetTrigger("Contract");
+            minimapCamAnim.SetTrigger("Contract");
+
+            timeText.gameObject.SetActive(false);
+            scoreText.gameObject.SetActive(false);
+        }
+
         if (hasHolyMantle)
         {
             holyMantleImage.SetActive(true);
-        } else
+        }
+        else
         {
             holyMantleImage.SetActive(false);
         }
@@ -157,7 +188,8 @@ public class LogicScript : MonoBehaviour
             gameOverScoreText.text = $"Score: {score.ToString("#,0.##")}";
             highscoreText.text = $"Highscore: {highscore.ToString("#,0.##")}";
             gameOverScreen.SetActive(true);
-        } else
+        }
+        else
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
@@ -249,12 +281,11 @@ public class LogicScript : MonoBehaviour
         if (Time.timeScale == 0)
         {
             Time.timeScale = 1;
-            pauseText.text = "Pause";
             gamePausedText.SetActive(false);
-        } else
+        }
+        else
         {
             Time.timeScale = 0;
-            pauseText.text = "Play";
             gamePausedText.SetActive(true);
         }
     }
@@ -265,5 +296,43 @@ public class LogicScript : MonoBehaviour
         int seconds = Mathf.FloorToInt(timeInSeconds % 60f);
 
         return string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    private int extraItems = -1;
+    public void AddItemHUD(Sprite sprite)
+    {
+        int length = foundHUDItems.Length;
+
+        // Mover todos los elementos hacia adelante en el arreglo
+        for (int i = length - 1; i > 0; i--)
+        {
+            Image currentItem = foundHUDItems[i].GetComponent<Image>();
+            Image previousItem = foundHUDItems[i - 1].GetComponent<Image>();
+
+            // Asignar el sprite del elemento anterior al elemento actual
+            currentItem.sprite = previousItem.sprite;
+
+            // Si el sprite del elemento anterior es nulo, establecer el alpha a 0
+            if (previousItem.sprite == null)
+            {
+                currentItem.color = new Color(1f, 1f, 1f, 0f);
+            }
+            else // Si hay un sprite, establecer el alpha a 1
+            {
+                currentItem.color = new Color(1f, 1f, 1f, 1f);
+
+                if (i + 1 == length) extraItems++;
+            }
+        }
+
+        if (extraItems > 0) {
+            extraItemsText.gameObject.SetActive(true);
+            extraItemsText.text = $"+{extraItems} items";
+        } else extraItemsText.gameObject.SetActive(false);
+
+        // Asignar el nuevo sprite al primer elemento
+        Image firstItem = foundHUDItems[0].GetComponent<Image>();
+        firstItem.sprite = sprite;
+        firstItem.color = new Color(1f, 1f, 1f, 1f); // Establecer el alpha a 1
     }
 }

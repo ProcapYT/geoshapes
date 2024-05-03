@@ -271,6 +271,16 @@ public class RoomStart : MonoBehaviour
                         doors[i].SetActive(false);
                     }
 
+                    if (player.pickedUpHolyMantle)
+                    {
+                        logic.hasHolyMantle = true;
+                    }
+
+                    if (player.currentActive != null)
+                    {
+                        player.activeCurrentCharges++;
+                    }
+
                     Destroy(gameObject);
                 }
             }

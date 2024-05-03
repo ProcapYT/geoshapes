@@ -10,6 +10,12 @@ public class BulletMovement : MonoBehaviour
     public Color spectralBulletsColor;
 
     private PlayerScript player;
+    private Rigidbody2D rb;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+    }
 
     private void Start()
     {
@@ -38,12 +44,11 @@ public class BulletMovement : MonoBehaviour
         GetComponent<TrailRenderer>().endColor = color;
     }
 
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         Vector3 direction = transform.up;
 
-        transform.position += direction * bulletSpeed * Time.deltaTime;
+        rb.velocity = direction * bulletSpeed;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

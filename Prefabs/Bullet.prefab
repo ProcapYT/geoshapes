@@ -131,14 +131,14 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1424098943088503529}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_AngularDrag: 0
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -148,7 +148,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!96 &4433286423415700580
 TrailRenderer:
@@ -277,6 +277,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletSpeed: 20
   bulletExplosion: {fileID: 8175070344540599678, guid: 04b8fb1f6849a5342bb0b31819b906bf, type: 3}
-  yellowParticles: {fileID: 8175070344540599678, guid: 2273022e747daf8479b8c6c43b6c5fa1, type: 3}
   redParticles: {fileID: 8175070344540599678, guid: 00be92878444c10449480efc2f155c8c, type: 3}
   spectralBulletsColor: {r: 0.41037738, g: 0.60409474, b: 1, a: 1}

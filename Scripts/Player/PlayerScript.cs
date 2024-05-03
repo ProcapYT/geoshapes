@@ -57,6 +57,7 @@ public class PlayerScript : MonoBehaviour
     public GameObject playerMissile;
 
     public float bulletSize = 1;
+    public float bulletSpeed = 20;
 
     // Start is called before the first frame update
     void Start()
@@ -97,6 +98,7 @@ public class PlayerScript : MonoBehaviour
 
                 GameObject instantiatedBullet = Instantiate(bullet, transform.position, bulletRotation);
                 instantiatedBullet.transform.localScale *= bulletSize;
+                instantiatedBullet.GetComponent<BulletMovement>().bulletSpeed = bulletSpeed;
 
                 shotTimer = 0;
             }
@@ -275,14 +277,11 @@ public class PlayerScript : MonoBehaviour
             case "Atack item":
                 PickUpItem(() =>
                 {
-                    if (shotSpeed >= 0.01f)
-                    {
-                        shotSpeed /= 2f;
-                    }
-                    else
-                    {
-                        shotSpeed = 0.01f;
-                    }
+                    shotSpeed /= 2f;
+                    if (shotSpeed < 0.01f) shotSpeed = 0.01f;
+
+                    bulletSize /= 1.3f;
+                    if (bulletSize < 0.1f) bulletSize = 0.1f;
                 }, collision.gameObject);
                 break;
 
@@ -331,6 +330,21 @@ public class PlayerScript : MonoBehaviour
                 PickUpItem(() =>
                 {
                     bulletSize += 0.5f;
+                }, collision.gameObject);
+                break;
+
+            case "Less Bullet Size":
+                PickUpItem(() =>
+                {
+                    bulletSize -= 0.25f;
+                    if (bulletSize < 0.1f) bulletSize = 0.1f;
+                }, collision.gameObject);
+                break;
+
+            case "Bullet Speed":
+                PickUpItem(() => 
+                { 
+                    bulletSpeed += 2.5f;
                 }, collision.gameObject);
                 break;
 
@@ -421,10 +435,10 @@ public class PlayerScript : MonoBehaviour
                 activeItemImage.sprite = sprite;
 
                 activeItemObject.SetActive(true);
-            }, itemGameObject);
+            }, itemGameObject, true);
         }
 
-        void PickUpItem(FunctionDelegate itemLogic, GameObject itemCollision)
+        void PickUpItem(FunctionDelegate itemLogic, GameObject itemCollision, bool isActive = false)
         {
             if (itemCollision.GetComponent<ShopItem>().cost <= coins)
             {
@@ -436,6 +450,8 @@ public class PlayerScript : MonoBehaviour
                 itemCollision.GetComponent<ShopItem>().apliedEffects = true;
 
                 totalItemsPickedUp++;
+
+                if (!isActive) logic.AddItemHUD(itemCollision.GetComponent<SpriteRenderer>().sprite);
             }
         }
 

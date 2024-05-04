@@ -99,6 +99,7 @@ public class PlayerScript : MonoBehaviour
                 GameObject instantiatedBullet = Instantiate(bullet, transform.position, bulletRotation);
                 instantiatedBullet.transform.localScale *= bulletSize;
                 instantiatedBullet.GetComponent<BulletMovement>().bulletSpeed = bulletSpeed;
+                instantiatedBullet.GetComponent<SpriteRenderer>().sprite = GetComponent<SpriteRenderer>().sprite;
 
                 shotTimer = 0;
             }
